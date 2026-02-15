@@ -1,25 +1,21 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Text, Card, Title, Paragraph, Button, Chip, Divider, ProgressBar, MD3Colors } from 'react-native-paper';
-import { MapPin, Phone, ClipboardList } from 'lucide-react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Card, Title, Chip } from 'react-native-paper';
+import { Wallet, TrendingUp } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 const PRIMARY_COLOR = '#008080';
 
 export default function HomeScreen() {
-    // Mock data as requested
-    const earnings = {
-        ordersCompleted: 12,
-        totalEarnings: 1560.50,
-        codCollected: 4500.00,
-        totalDistance: 45,
-    };
+    const router = useRouter();
 
-    const weeklyData = {
+    const weeklySummary = {
+        weekRange: 'Feb 9 – Feb 15',
         totalOrders: 48,
-        totalEarnings: 6240.00,
-        totalCodCollected: 12500.00,
-        finalPayout: 6240.00,
-        achievementBonus: 0,
+        grossEarnings: 6240.00,
+        codCollected: 12500.00,
+        achievementBonus: 500.00,
+        finalPayout: 6740.00,
     };
 
     const activeOrders = [
@@ -27,239 +23,188 @@ export default function HomeScreen() {
             id: 'ORD001',
             customerName: 'Rahul Sharma',
             address: '123, MG Road, Bangalore',
-            customerPhone: '+91 9876543210',
             status: 'Out-for-pickup',
-            totalKilometre: 5.2,
             distanceEarning: 65,
         },
         {
             id: 'ORD002',
             customerName: 'Priya Verma',
             address: '45, Indiranagar, Bangalore',
-            customerPhone: '+91 9123456789',
             status: 'Picked Up',
-            totalKilometre: 3.8,
             distanceEarning: 48,
         }
     ];
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.content}>
-                <Text variant="headlineMedium" style={styles.header}>
-                    Delivery Dashboard
-                </Text>
-
-                {/* Today's Summary */}
-                <Card style={styles.summaryCard}>
-                    <Card.Content>
-                        <Title style={styles.cardTitle}>Today's Summary</Title>
-                        <View style={styles.grid}>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>{earnings.ordersCompleted}</Text>
-                                <Text style={styles.labelText}>Orders</Text>
-                            </View>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>₹{earnings.totalEarnings.toFixed(2)}</Text>
-                                <Text style={styles.labelText}>Earnings</Text>
-                            </View>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>₹{earnings.codCollected.toFixed(2)}</Text>
-                                <Text style={styles.labelText}>COD</Text>
-                            </View>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>{earnings.totalDistance} km</Text>
-                                <Text style={styles.labelText}>Distance</Text>
-                            </View>
-                        </View>
-                    </Card.Content>
-                </Card>
-
-                {/* Weekly Summary */}
-                <Card style={styles.weeklyCard}>
-                    <Card.Content>
-                        <View style={styles.weeklyHeader}>
-                            <Title style={styles.cardTitle}>Weekly Summary</Title>
-                            <Text variant="bodySmall" style={styles.payoutText}>Payout: Sunday</Text>
-                        </View>
-                        <View style={styles.grid}>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>{weeklyData.totalOrders}</Text>
-                                <Text style={styles.labelText}>Total Orders</Text>
-                            </View>
-                            <View style={styles.gridItem}>
-                                <Text style={styles.valueText}>₹{weeklyData.totalEarnings.toFixed(2)}</Text>
-                                <Text style={styles.labelText}>Weekly Earnings</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.progressSection}>
-                            <View style={styles.progressHeader}>
-                                <Text variant="bodyMedium" style={{ fontWeight: 'bold' }}>Progress</Text>
-                                <Text variant="bodySmall">{weeklyData.totalOrders}/75 orders</Text>
-                            </View>
-                            <ProgressBar progress={weeklyData.totalOrders / 75} color={PRIMARY_COLOR} style={styles.progressBar} />
-                        </View>
-                    </Card.Content>
-                </Card>
-
-                {/* Active Orders */}
-                <Text variant="titleLarge" style={styles.sectionTitle}>
-                    Active Orders ({activeOrders.length})
-                </Text>
-
-                {activeOrders.map((order) => (
-                    <Card key={order.id} style={styles.orderCard}>
+        <View style={styles.mainContainer}>
+            <ScrollView style={styles.container}>
+                <View style={styles.content}>
+                    {/* Weekly Summary Card (Moved from Earnings) */}
+                    <Card style={styles.weeklyCard}>
                         <Card.Content>
-                            <View style={styles.orderHeader}>
-                                <View style={{ flex: 1 }}>
-                                    <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>{order.customerName}</Text>
-                                    <View style={styles.infoRow}>
-                                        <MapPin size={14} color="#666" />
-                                        <Text variant="bodySmall" style={styles.infoText}>{order.address}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Phone size={14} color="#666" />
-                                        <Text variant="bodySmall" style={styles.infoText}>{order.customerPhone}</Text>
-                                    </View>
+                            <View style={styles.weeklyHeader}>
+                                <View>
+                                    <Title style={{ color: PRIMARY_COLOR, fontWeight: 'bold' }}>Weekly Summary</Title>
+                                    <Text variant="bodySmall" style={{ color: '#666' }}>{weeklySummary.weekRange}</Text>
                                 </View>
-                                <Chip mode="flat" style={styles.statusChip} textStyle={{ color: '#fff' }}>
-                                    {order.status}
+                                <Chip mode="flat" style={styles.payoutChip} textStyle={{ color: '#fff', fontSize: 10 }}>
+                                    Payout: Sunday
                                 </Chip>
                             </View>
-                            <Divider style={styles.divider} />
-                            <View style={styles.orderFooter}>
-                                <View>
-                                    <Text variant="bodySmall">Distance: {order.totalKilometre} km</Text>
-                                    <Text variant="bodySmall">Earnings: ₹{order.distanceEarning}</Text>
+
+                            <View style={styles.grid}>
+                                <View style={styles.gridItem}>
+                                    <Text style={styles.gridValue}>{weeklySummary.totalOrders}</Text>
+                                    <Text style={styles.gridLabel}>Orders</Text>
                                 </View>
-                                <Button
-                                    mode="contained"
-                                    buttonColor={PRIMARY_COLOR}
-                                    onPress={() => { }}
-                                    style={styles.detailsButton}
-                                >
-                                    Details
-                                </Button>
+                                <View style={styles.gridItem}>
+                                    <Text style={styles.gridValue}>₹{weeklySummary.grossEarnings}</Text>
+                                    <Text style={styles.gridLabel}>Gross</Text>
+                                </View>
+                                <View style={styles.gridItem}>
+                                    <Text style={styles.gridValue}>₹{weeklySummary.codCollected}</Text>
+                                    <Text style={styles.gridLabel}>COD</Text>
+                                </View>
+                                <View style={styles.gridItem}>
+                                    <Text style={styles.gridValue}>₹{weeklySummary.achievementBonus}</Text>
+                                    <Text style={styles.gridLabel}>Bonus</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.payoutStrip}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                    <Wallet size={20} color={PRIMARY_COLOR} />
+                                    <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>Final Payout</Text>
+                                </View>
+                                <Text variant="titleLarge" style={{ fontWeight: 'bold', color: PRIMARY_COLOR }}>
+                                    ₹{weeklySummary.finalPayout}
+                                </Text>
                             </View>
                         </Card.Content>
                     </Card>
-                ))}
-            </View>
-        </ScrollView>
+
+                    {/* Active Orders Section */}
+                    <View style={styles.sectionHeader}>
+                        <Text variant="titleLarge" style={styles.sectionTitle}>
+                            Active Orders ({activeOrders.length})
+                        </Text>
+                        <TrendingUp size={20} color={PRIMARY_COLOR} />
+                    </View>
+
+                    {activeOrders.map((order) => (
+                        <TouchableOpacity
+                            key={order.id}
+                            activeOpacity={0.7}
+                            onPress={() => router.push('/orders')}
+                        >
+                            <Card style={styles.orderCard}>
+                                <Card.Content>
+                                    <View style={styles.orderHeader}>
+                                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <View>
+                                                <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>Order #{order.id}</Text>
+                                                <Text variant="bodySmall" style={{ color: PRIMARY_COLOR, fontWeight: 'bold', marginTop: 2 }}>
+                                                    {order.status}
+                                                </Text>
+                                            </View>
+                                            <Text variant="titleLarge" style={{ color: '#333', fontWeight: 'bold' }}>₹{order.distanceEarning}</Text>
+                                        </View>
+                                    </View>
+                                </Card.Content>
+                            </Card>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    mainContainer: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+    },
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
     },
     content: {
         padding: 16,
-        paddingBottom: 40,
-    },
-    header: {
-        color: PRIMARY_COLOR,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        marginTop: 10,
-    },
-    summaryCard: {
-        marginBottom: 16,
-        borderLeftWidth: 4,
-        borderLeftColor: PRIMARY_COLOR,
-        backgroundColor: '#fff',
-        elevation: 4,
+        paddingBottom: 160,
     },
     weeklyCard: {
-        marginBottom: 16,
         backgroundColor: '#fff',
         elevation: 4,
+        borderRadius: 16,
+        marginBottom: 24,
+        borderTopWidth: 4,
+        borderTopColor: PRIMARY_COLOR,
     },
-    cardTitle: {
-        fontSize: 18,
-        marginBottom: 10,
+    weeklyHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+    },
+    payoutChip: {
+        backgroundColor: PRIMARY_COLOR,
+        height: 24,
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
+        marginBottom: 10,
     },
     gridItem: {
         width: '48%',
-        marginBottom: 15,
+        backgroundColor: '#f1f8f8',
+        padding: 15,
+        borderRadius: 12,
         alignItems: 'center',
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#e0f2f2',
     },
-    valueText: {
+    gridValue: {
         fontSize: 18,
         fontWeight: 'bold',
         color: PRIMARY_COLOR,
     },
-    labelText: {
+    gridLabel: {
         fontSize: 12,
         color: '#666',
+        marginTop: 2,
     },
-    weeklyHeader: {
+    payoutStrip: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingTop: 15,
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+        marginTop: 5,
     },
-    payoutText: {
-        color: PRIMARY_COLOR,
-        fontWeight: 'bold',
-    },
-    progressSection: {
-        marginTop: 10,
-        padding: 10,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 8,
-    },
-    progressHeader: {
+    sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 5,
-    },
-    progressBar: {
-        height: 8,
-        borderRadius: 4,
+        alignItems: 'center',
+        marginBottom: 15,
+        paddingHorizontal: 4,
     },
     sectionTitle: {
-        marginVertical: 15,
         fontWeight: 'bold',
+        color: '#333',
     },
     orderCard: {
         marginBottom: 16,
         backgroundColor: '#fff',
         elevation: 2,
+        borderRadius: 12,
     },
     orderHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-    },
-    infoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4,
-        gap: 5,
-    },
-    infoText: {
-        color: '#666',
-        flexShrink: 1,
-    },
-    statusChip: {
-        backgroundColor: PRIMARY_COLOR,
-        height: 32,
-    },
-    divider: {
-        marginVertical: 12,
-    },
-    orderFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    detailsButton: {
-        borderRadius: 8,
     }
 });

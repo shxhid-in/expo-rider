@@ -49,11 +49,7 @@ export default function OrdersScreen() {
     ];
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Title style={styles.headerTitle}>My Orders</Title>
-            </View>
-
+        <View style={styles.mainContainer}>
             <View style={styles.tabContainer}>
                 <SegmentedButtons
                     value={activeTab}
@@ -74,13 +70,15 @@ export default function OrdersScreen() {
                             <Card.Content>
                                 <View style={styles.orderTopRow}>
                                     <Text variant="titleMedium" style={styles.orderId}>#ORDER-{order.orderNumber}</Text>
-                                    <Chip
-                                        mode="flat"
-                                        style={[styles.statusChip, { backgroundColor: order.status === 'Out-for-pickup' ? '#E65100' : '#1B5E20' }]}
-                                        textStyle={{ color: '#fff', fontSize: 10 }}
-                                    >
-                                        {order.status}
-                                    </Chip>
+                                    <View style={{ flexDirection: 'row', gap: 5 }}>
+                                        <Chip
+                                            mode="flat"
+                                            style={[styles.statusChip, { backgroundColor: order.status === 'Out-for-pickup' ? '#008080' : '#1B5E20' }]}
+                                            textStyle={{ color: '#fff', fontSize: 10 }}
+                                        >
+                                            {order.status}
+                                        </Chip>
+                                    </View>
                                 </View>
 
                                 <View style={styles.customerBox}>
@@ -98,8 +96,8 @@ export default function OrdersScreen() {
 
                                     <View style={styles.paymentRow}>
                                         <View style={styles.paymentMethod}>
-                                            <CreditCard size={14} color={order.paymentMode === 'COD' ? '#E65100' : '#1B5E20'} />
-                                            <Text style={[styles.paymentLabel, { color: order.paymentMode === 'COD' ? '#E65100' : '#1B5E20' }]}>
+                                            <CreditCard size={14} color={order.paymentMode === 'COD' ? '#008080' : '#1B5E20'} />
+                                            <Text style={[styles.paymentLabel, { color: order.paymentMode === 'COD' ? '#008080' : '#1B5E20' }]}>
                                                 {order.paymentMode}
                                             </Text>
                                         </View>
@@ -178,18 +176,9 @@ export default function OrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
+    mainContainer: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    header: {
-        padding: 16,
-        backgroundColor: '#fff',
-        elevation: 2,
-    },
-    headerTitle: {
-        color: PRIMARY_COLOR,
-        fontWeight: 'bold',
+        backgroundColor: '#f8f9fa',
     },
     tabContainer: {
         padding: 16,
@@ -199,7 +188,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 16,
-        paddingBottom: 40,
+        paddingBottom: 160,
     },
     orderCard: {
         marginBottom: 20,
