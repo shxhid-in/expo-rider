@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Text, Card, Title, Paragraph, Button, Chip, Divider, SegmentedButtons } from 'react-native-paper';
-import { MapPin, Phone, Package, Navigation, Clock, CreditCard, ChevronDown } from 'lucide-react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { Text, Title, Divider, Chip } from 'react-native-paper';
+import { MapPin, Phone, Package, Navigation, Clock, CheckCircle2 } from 'lucide-react-native';
 
+const { width } = Dimensions.get('window');
 const PRIMARY_COLOR = '#008080';
 
 export default function OrdersScreen() {
@@ -19,9 +20,10 @@ export default function OrdersScreen() {
             paymentMode: 'COD',
             totalAmount: 1250,
             items: [
-                { name: 'Chicken Curry Cut', quantity: 2, cuttype: 'Medium', butcher: 'Aslam' },
-                { name: 'Mutton Chops', quantity: 1, cuttype: 'Regular', butcher: 'Aslam' }
-            ]
+                { name: 'Chicken Curry Cut', qty: 2 },
+                { name: 'Mutton Chops', qty: 1 }
+            ],
+            time: '10 mins ago'
         },
         {
             id: '2',
@@ -33,8 +35,9 @@ export default function OrdersScreen() {
             paymentMode: 'Paid',
             totalAmount: 850,
             items: [
-                { name: 'Fish Fry Cut', quantity: 1, cuttype: 'Slices', butcher: 'Rahman' }
-            ]
+                { name: 'Fish Fry Cut', qty: 1 }
+            ],
+            time: '25 mins ago'
         }
     ];
 
@@ -45,129 +48,119 @@ export default function OrdersScreen() {
             customerName: 'Amit Singh',
             address: 'Near Metro Station, Bangalore',
             deliveredAt: '10:30 AM',
+            totalAmount: 450,
         }
     ];
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.tabContainer}>
-                <SegmentedButtons
-                    value={activeTab}
-                    onValueChange={setActiveTab}
-                    style={styles.segmentedButtons}
-                    buttons={[
-                        { value: 'active', label: 'Active', checkedColor: '#fff', uncheckedColor: '#666' },
-                        { value: 'completed', label: 'Completed', checkedColor: '#fff', uncheckedColor: '#666' },
-                    ]}
-                    theme={{ colors: { secondaryContainer: PRIMARY_COLOR } }}
-                />
+            {/* Top Floating Pill Tabs - White Theme */}
+            <View style={styles.topTabContainer}>
+                <View style={styles.whitePill}>
+                    <TouchableOpacity
+                        style={[styles.pillItem, activeTab === 'active' && styles.activePill]}
+                        onPress={() => setActiveTab('active')}
+                    >
+                        <Clock size={16} color={activeTab === 'active' ? '#fff' : '#666'} />
+                        <Text style={[styles.pillText, activeTab === 'active' && styles.activePillText]}>Active</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.pillItem, activeTab === 'completed' && styles.activePill]}
+                        onPress={() => setActiveTab('completed')}
+                    >
+                        <CheckCircle2 size={16} color={activeTab === 'completed' ? '#fff' : '#666'} />
+                        <Text style={[styles.pillText, activeTab === 'completed' && styles.activePillText]}>Completed</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
                 {activeTab === 'active' ? (
                     activeOrders.map((order) => (
-                        <Card key={order.id} style={styles.orderCard}>
-                            <Card.Content>
-                                <View style={styles.orderTopRow}>
-                                    <Text variant="titleMedium" style={styles.orderId}>#ORDER-{order.orderNumber}</Text>
-                                    <View style={{ flexDirection: 'row', gap: 5 }}>
-                                        <Chip
-                                            mode="flat"
-                                            style={[styles.statusChip, { backgroundColor: order.status === 'Out-for-pickup' ? '#008080' : '#1B5E20' }]}
-                                            textStyle={{ color: '#fff', fontSize: 10 }}
-                                        >
-                                            {order.status}
-                                        </Chip>
-                                    </View>
-                                </View>
-
-                                <View style={styles.customerBox}>
-                                    <Text variant="titleMedium" style={styles.customerName}>{order.customerName}</Text>
-                                    <View style={styles.infoRow}>
-                                        <Phone size={14} color={PRIMARY_COLOR} />
-                                        <Text variant="bodySmall" style={styles.customerPhone}>{order.customerPhone}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <MapPin size={14} color="#666" />
-                                        <Text variant="bodySmall" style={styles.addressText}>{order.address}</Text>
-                                    </View>
-
-                                    <Divider style={styles.paymentDivider} />
-
-                                    <View style={styles.paymentRow}>
-                                        <View style={styles.paymentMethod}>
-                                            <CreditCard size={14} color={order.paymentMode === 'COD' ? '#008080' : '#1B5E20'} />
-                                            <Text style={[styles.paymentLabel, { color: order.paymentMode === 'COD' ? '#008080' : '#1B5E20' }]}>
-                                                {order.paymentMode}
-                                            </Text>
+                        <TouchableOpacity key={order.id} activeOpacity={0.9}>
+                            <View style={styles.compactCard}>
+                                <View style={styles.cardHeader}>
+                                    <View style={styles.headerLeft}>
+                                        <View style={styles.orderIdBadge}>
+                                            <Text style={styles.orderIdText}>#{order.orderNumber}</Text>
                                         </View>
-                                        {order.paymentMode === 'COD' && (
-                                            <Text variant="titleMedium" style={styles.amountText}>₹{order.totalAmount}</Text>
-                                        )}
+                                        <Text style={styles.timeAgo}>{order.time}</Text>
+                                    </View>
+                                    <View style={[styles.statusBadge, { backgroundColor: order.status === 'Picked Up' ? '#e8f5e9' : '#e3f2fd' }]}>
+                                        <Text style={[styles.statusBadgeText, { color: order.status === 'Picked Up' ? '#2e7d32' : '#1565c0' }]}>
+                                            {order.status.toUpperCase()}
+                                        </Text>
                                     </View>
                                 </View>
 
-                                <View style={styles.itemsBox}>
-                                    <Text variant="labelSmall" style={styles.itemsHeader}>ORDER ITEMS</Text>
-                                    {order.items.map((item, idx) => (
-                                        <View key={idx} style={styles.itemRow}>
-                                            <Text variant="bodySmall" style={styles.itemName}>
-                                                {item.quantity} x {item.name} ({item.cuttype})
-                                            </Text>
-                                            <Text variant="bodySmall" style={styles.butcherName}>{item.butcher}</Text>
+                                <View style={styles.cardBody}>
+                                    <View style={styles.mainInfo}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.customerName}>{order.customerName}</Text>
+                                            <View style={styles.addressRow}>
+                                                <MapPin size={12} color="#999" />
+                                                <Text numberOfLines={1} style={styles.addressText}>{order.address}</Text>
+                                            </View>
                                         </View>
-                                    ))}
-                                </View>
+                                        <View style={styles.priceTag}>
+                                            <Text style={styles.priceText}>₹{order.totalAmount}</Text>
+                                            <Text style={styles.paymentMethod}>{order.paymentMode}</Text>
+                                        </View>
+                                    </View>
 
-                                <View style={styles.actionRow}>
-                                    <Button
-                                        mode="outlined"
-                                        onPress={() => { }}
-                                        style={styles.actionButton}
-                                        textColor="#0288D1"
-                                        icon={() => <Phone size={16} color="#0288D1" />}
-                                    >
-                                        Call
-                                    </Button>
-                                    <Button
-                                        mode="contained"
-                                        onPress={() => { }}
-                                        style={[styles.actionButton, { backgroundColor: PRIMARY_COLOR }]}
-                                        icon={() => <Navigation size={16} color="#fff" />}
-                                    >
-                                        Navigate
-                                    </Button>
-                                </View>
+                                    <View style={styles.itemsListContainer}>
+                                        {order.items.map((item, idx) => (
+                                            <View key={idx} style={styles.itemLine}>
+                                                <Package size={12} color="#999" />
+                                                <Text style={styles.itemLineText}>{item.name} ({item.qty})</Text>
+                                            </View>
+                                        ))}
+                                    </View>
 
-                                <Button
-                                    mode="outlined"
-                                    onPress={() => { }}
-                                    style={styles.statusButton}
-                                    textColor={order.status === 'Out-for-pickup' ? '#0288D1' : '#1B5E20'}
-                                >
-                                    {order.status === 'Out-for-pickup' ? 'Mark as Picked Up' : 'Mark as Delivered'}
-                                </Button>
-                            </Card.Content>
-                        </Card>
+                                    <Divider style={styles.cardDivider} />
+
+                                    <View style={styles.cardFooter}>
+                                        <TouchableOpacity style={styles.actionBtnSecondary}>
+                                            <Phone size={16} color={PRIMARY_COLOR} />
+                                            <Text style={styles.btnTextSecondary}>Call</Text>
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity style={styles.actionBtnPrimary}>
+                                            <Navigation size={16} color="#fff" />
+                                            <Text style={styles.btnTextPrimary}>Navigate</Text>
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <TouchableOpacity style={styles.statusUpdateButton}>
+                                        <Text style={styles.statusUpdateText}>
+                                            {order.status === 'Out-for-pickup' ? 'Mark as Picked Up' : 'Mark as Delivered'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
                     ))
                 ) : (
                     completedOrders.map((order) => (
-                        <Card key={order.id} style={styles.completedCard}>
-                            <Card.Content>
-                                <View style={styles.orderTopRow}>
-                                    <Text variant="titleMedium" style={[styles.orderId, { color: '#1B5E20' }]}>#ORDER-{order.orderNumber} • Delivered</Text>
+                        <View key={order.id} style={styles.completedCompactCard}>
+                            <View style={styles.completedInfo}>
+                                <View style={styles.checkCircle}>
+                                    <CheckCircle2 size={16} color="#fff" />
                                 </View>
-                                <Text variant="bodyMedium" style={styles.customerName}>{order.customerName}</Text>
-                                <View style={styles.infoRow}>
-                                    <MapPin size={14} color="#666" />
-                                    <Text variant="bodySmall" style={styles.addressText}>{order.address}</Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={styles.completedOrderTitle}>Order #{order.orderNumber}</Text>
+                                    <Text style={styles.completedSubtext}>Delivered to {order.customerName}</Text>
                                 </View>
-                                <View style={[styles.infoRow, { marginTop: 10 }]}>
-                                    <Package size={16} color="#1B5E20" />
-                                    <Text variant="bodySmall" style={{ color: '#1B5E20', fontWeight: 'bold' }}>Completed at {order.deliveredAt}</Text>
+                                <View style={{ alignItems: 'flex-end' }}>
+                                    <Text style={styles.completedTime}>{order.deliveredAt}</Text>
+                                    <Text style={styles.completedAmount}>₹{order.totalAmount}</Text>
                                 </View>
-                            </Card.Content>
-                        </Card>
+                            </View>
+                        </View>
                     ))
                 )}
             </ScrollView>
@@ -180,127 +173,246 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f9fa',
     },
-    tabContainer: {
-        padding: 16,
+    topTabContainer: {
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        alignItems: 'center',
     },
-    segmentedButtons: {
-        borderRadius: 8,
+    whitePill: {
+        flexDirection: 'row',
+        backgroundColor: '#f1f3f5',
+        padding: 4,
+        borderRadius: 30,
+        width: '100%',
+        maxWidth: 320,
+        justifyContent: 'space-between',
+    },
+    pillItem: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        paddingVertical: 10,
+        borderRadius: 25,
+    },
+    activePill: {
+        backgroundColor: PRIMARY_COLOR,
+    },
+    pillText: {
+        color: '#666',
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    activePillText: {
+        color: '#fff',
     },
     scrollContent: {
         padding: 16,
         paddingBottom: 160,
     },
-    orderCard: {
-        marginBottom: 20,
+    compactCard: {
         backgroundColor: '#fff',
-        elevation: 4,
-        borderLeftWidth: 4,
-        borderLeftColor: PRIMARY_COLOR,
-    },
-    completedCard: {
+        borderRadius: 15,
         marginBottom: 16,
-        backgroundColor: '#fff',
-        elevation: 2,
-        borderLeftWidth: 4,
-        borderLeftColor: '#1B5E20',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        overflow: 'visible', // Allow status badge to display correctly if needed
     },
-    orderTopRow: {
+    cardHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f8f9fa',
     },
-    orderId: {
-        fontWeight: 'bold',
-        color: PRIMARY_COLOR,
-    },
-    statusChip: {
-        height: 24,
-    },
-    customerBox: {
-        backgroundColor: '#f9f9f9',
-        padding: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#eee',
-        marginBottom: 15,
-    },
-    customerName: {
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    infoRow: {
+    headerLeft: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
-        gap: 6,
+        gap: 8,
     },
-    customerPhone: {
-        fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-        color: '#666',
-    },
-    addressText: {
-        color: '#666',
-        flexShrink: 1,
-    },
-    paymentDivider: {
-        marginVertical: 10,
-    },
-    paymentRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    paymentMethod: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 5,
-    },
-    paymentLabel: {
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    amountText: {
-        fontWeight: 'bold',
-        color: PRIMARY_COLOR,
-    },
-    itemsBox: {
-        backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#eee',
-        marginBottom: 20,
-    },
-    itemsHeader: {
-        color: '#999',
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    itemRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    orderIdBadge: {
+        backgroundColor: '#f0f7f7',
+        paddingHorizontal: 10,
         paddingVertical: 4,
-        borderBottomWidth: 0.5,
-        borderBottomColor: '#eee',
+        borderRadius: 8,
     },
-    itemName: {
-        flex: 1,
+    orderIdText: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
     },
-    butcherName: {
+    timeAgo: {
+        fontSize: 11,
         color: '#999',
-        fontStyle: 'italic',
     },
-    actionRow: {
+    statusBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    statusBadgeText: {
+        fontSize: 10,
+        fontWeight: '900',
+    },
+    cardBody: {
+        padding: 16,
+    },
+    mainInfo: {
         flexDirection: 'row',
-        gap: 10,
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
         marginBottom: 12,
     },
-    actionButton: {
-        flex: 1,
-        borderRadius: 8,
+    customerName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#1a1a1a',
     },
-    statusButton: {
+    addressRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginTop: 4,
+    },
+    addressText: {
+        fontSize: 12,
+        color: '#777',
+    },
+    priceTag: {
+        alignItems: 'flex-end',
+    },
+    priceText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: PRIMARY_COLOR,
+    },
+    paymentMethod: {
+        fontSize: 10,
+        color: '#999',
+        fontWeight: 'bold',
+        marginTop: 2,
+    },
+    itemsListContainer: {
+        backgroundColor: '#fdfdfd',
         borderRadius: 8,
+        padding: 10,
+        gap: 6,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+    },
+    itemLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    itemLineText: {
+        fontSize: 12,
+        color: '#555',
+        fontWeight: '500',
+    },
+    cardDivider: {
+        marginVertical: 16,
+        backgroundColor: '#f0f0f0',
+    },
+    cardFooter: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    actionBtnPrimary: {
+        flex: 1.5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        backgroundColor: PRIMARY_COLOR,
+        paddingVertical: 12,
+        borderRadius: 12,
+    },
+    btnTextPrimary: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    actionBtnSecondary: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        backgroundColor: '#fff',
+        paddingVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1.5,
+        borderColor: PRIMARY_COLOR,
+    },
+    btnTextSecondary: {
+        color: PRIMARY_COLOR,
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    statusUpdateButton: {
+        backgroundColor: '#fff',
+        marginTop: 12,
+        paddingVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: PRIMARY_COLOR,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+    },
+    statusUpdateText: {
+        color: PRIMARY_COLOR,
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    completedCompactCard: {
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        marginBottom: 12,
+        padding: 16,
+        borderLeftWidth: 4,
+        borderLeftColor: '#4caf50',
+        elevation: 2,
+    },
+    completedInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    checkCircle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#4caf50',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    completedOrderTitle: {
+        fontSize: 15,
+        fontWeight: 'bold',
+    },
+    completedSubtext: {
+        fontSize: 12,
+        color: '#777',
+    },
+    completedTime: {
+        fontSize: 11,
+        color: '#4caf50',
+        fontWeight: 'bold',
+    },
+    completedAmount: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
     }
 });

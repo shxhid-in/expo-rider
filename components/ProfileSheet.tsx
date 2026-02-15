@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Modal, Pressable } from 'react-native';
-import { Text, Card, Title, Avatar, List, Switch, Divider, Button } from 'react-native-paper';
-import { User, FileText, Landmark, Bell, LogOut, ChevronRight, Settings, X } from 'lucide-react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Modal, Pressable, Animated, Platform } from 'react-native';
+import { Text, Title, Avatar, Divider, Switch, Button } from 'react-native-paper';
+import { User, FileText, Landmark, Bell, LogOut, ChevronRight, X } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 const PRIMARY_COLOR = '#008080';
@@ -17,6 +17,49 @@ export default function ProfileSheet({ visible, onDismiss }: ProfileSheetProps) 
     const [isAvailable, setIsAvailable] = useState(true);
     const router = useRouter();
 
+    // Animation refs
+    const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (visible) {
+            // Open animation
+            Animated.parallel([
+                Animated.timing(fadeAnim, {
+                    toValue: 1,
+                    duration: 300,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(slideAnim, {
+                    toValue: 0,
+                    duration: 400,
+                    useNativeDriver: true,
+                })
+            ]).start();
+        } else {
+            // Reset values for next open
+            slideAnim.setValue(SCREEN_HEIGHT);
+            fadeAnim.setValue(0);
+        }
+    }, [visible]);
+
+    const handleDismiss = () => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 250,
+                useNativeDriver: true,
+            }),
+            Animated.timing(slideAnim, {
+                toValue: SCREEN_HEIGHT,
+                duration: 300,
+                useNativeDriver: true,
+            })
+        ]).start(() => {
+            onDismiss();
+        });
+    };
+
     const user = {
         name: 'Rahul Sharma',
         email: 'rahul.s@bezgofresh.com',
@@ -25,110 +68,107 @@ export default function ProfileSheet({ visible, onDismiss }: ProfileSheetProps) 
     };
 
     const handleLogout = () => {
-        onDismiss();
-        router.replace('/login');
+        handleDismiss();
+        setTimeout(() => {
+            router.replace('/login');
+        }, 300);
     };
+
+    const MenuItem = ({ icon: Icon, title, onPress, showDivider = true }: any) => (
+        <View>
+            <TouchableOpacity onPress={onPress} style={styles.menuItem}>
+                <View style={styles.menuLeft}>
+                    <View style={styles.iconCircle}>
+                        <Icon size={18} color={PRIMARY_COLOR} />
+                    </View>
+                    <Text style={styles.menuTitle}>{title}</Text>
+                </View>
+                <ChevronRight size={18} color="#ccc" />
+            </TouchableOpacity>
+            {showDivider && <Divider style={styles.menuDivider} />}
+        </View>
+    );
 
     return (
         <Modal
             visible={visible}
-            animationType="slide"
             transparent={true}
-            onRequestClose={onDismiss}
+            animationType="none" // Custom animation
+            onRequestClose={handleDismiss}
         >
             <View style={styles.modalOverlay}>
-                <Pressable style={styles.backdrop} onPress={onDismiss} />
-                <View style={styles.sheetContent}>
+                <Animated.View
+                    style={[
+                        styles.backdrop,
+                        { opacity: fadeAnim }
+                    ]}
+                >
+                    <Pressable style={{ flex: 1 }} onPress={handleDismiss} />
+                </Animated.View>
+
+                <Animated.View
+                    style={[
+                        styles.sheetContent,
+                        { transform: [{ translateY: slideAnim }] }
+                    ]}
+                >
                     <View style={styles.dragHandle} />
 
-                    <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
+                    <TouchableOpacity onPress={handleDismiss} style={styles.closeButton}>
                         <X size={24} color="#666" />
                     </TouchableOpacity>
 
-                    <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
                         <View style={styles.header}>
                             <Avatar.Icon size={70} icon="account" style={{ backgroundColor: PRIMARY_COLOR }} />
                             <Title style={styles.name}>{user.name}</Title>
-                            <Text style={styles.email}>{user.email}</Text>
-                            <Text style={styles.phone}>{user.phone}</Text>
+                            <View style={styles.userInfoSub}>
+                                <Text style={styles.email}>{user.email}</Text>
+                                <Text style={styles.phone}>{user.phone}</Text>
+                            </View>
                         </View>
 
                         <View style={styles.content}>
-                            {/* Availability Card */}
-                            <Card style={[styles.availabilityCard, { backgroundColor: isAvailable ? '#f0fff4' : '#fff5f5', borderColor: isAvailable ? '#c6f6d5' : '#fed7d7' }]}>
-                                <Card.Content>
-                                    <View style={styles.availabilityRow}>
-                                        <View>
-                                            <Title style={{ fontSize: 16, fontWeight: 'bold', color: isAvailable ? '#2f855a' : '#c53030' }}>
-                                                {isAvailable ? 'Available for Orders' : 'Offline'}
-                                            </Title>
-                                            <Text variant="bodySmall" style={{ color: '#666' }}>
-                                                Toggle to start/stop receiving deliveries
-                                            </Text>
-                                        </View>
-                                        <Switch
-                                            value={isAvailable}
-                                            onValueChange={setIsAvailable}
-                                            color={isAvailable ? '#48bb78' : PRIMARY_COLOR}
-                                        />
+                            {/* Availability Box */}
+                            <View style={[styles.availabilityBox, { backgroundColor: isAvailable ? '#f0fff4' : '#fff5f5' }]}>
+                                <View style={styles.availabilityRow}>
+                                    <View>
+                                        <Text style={[styles.availStatusText, { color: isAvailable ? '#2f855a' : '#c53030' }]}>
+                                            {isAvailable ? 'Available for Orders' : 'Offline'}
+                                        </Text>
+                                        <Text style={styles.availSubtext}>
+                                            Toggle to start/stop receiving deliveries
+                                        </Text>
                                     </View>
-                                </Card.Content>
-                            </Card>
+                                    <Switch
+                                        value={isAvailable}
+                                        onValueChange={setIsAvailable}
+                                        color={isAvailable ? '#48bb78' : PRIMARY_COLOR}
+                                    />
+                                </View>
+                            </View>
 
                             {/* Menu List */}
-                            <Card style={styles.menuCard}>
-                                <List.Section>
-                                    <List.Item
-                                        title="Profile"
-                                        left={props => <View style={styles.iconCircle}><User size={18} color={PRIMARY_COLOR} /></View>}
-                                        right={props => <ChevronRight size={18} color="#999" style={{ alignSelf: 'center' }} />}
-                                        onPress={() => { }}
-                                    />
-                                    <Divider />
-                                    <List.Item
-                                        title="Documents"
-                                        left={props => <View style={styles.iconCircle}><FileText size={18} color={PRIMARY_COLOR} /></View>}
-                                        right={props => <ChevronRight size={18} color="#999" style={{ alignSelf: 'center' }} />}
-                                        onPress={() => { }}
-                                    />
-                                    <Divider />
-                                    <List.Item
-                                        title="Bank Account"
-                                        left={props => <View style={styles.iconCircle}><Landmark size={18} color={PRIMARY_COLOR} /></View>}
-                                        right={props => <ChevronRight size={18} color="#999" style={{ alignSelf: 'center' }} />}
-                                        onPress={() => { }}
-                                    />
-                                    <Divider />
-                                    <List.Item
-                                        title="Notifications"
-                                        left={props => <View style={styles.iconCircle}><Bell size={18} color={PRIMARY_COLOR} /></View>}
-                                        right={props => <ChevronRight size={18} color="#999" style={{ alignSelf: 'center' }} />}
-                                        onPress={() => { }}
-                                    />
-                                    <Divider />
-                                    <List.Item
-                                        title="Settings"
-                                        left={props => <View style={styles.iconCircle}><Settings size={18} color={PRIMARY_COLOR} /></View>}
-                                        right={props => <ChevronRight size={18} color="#999" style={{ alignSelf: 'center' }} />}
-                                        onPress={() => { }}
-                                    />
-                                </List.Section>
-                            </Card>
+                            <View style={styles.menuCard}>
+                                <MenuItem icon={User} title="Profile" onPress={() => { }} />
+                                <MenuItem icon={FileText} title="Documents" onPress={() => { }} />
+                                <MenuItem icon={Landmark} title="Bank Account" onPress={() => { }} />
+                                <MenuItem icon={Bell} title="Notifications" onPress={() => { }} showDivider={false} />
+                            </View>
 
-                            <Button
-                                mode="contained"
+                            <TouchableOpacity
+                                style={styles.logoutBtn}
                                 onPress={handleLogout}
-                                style={styles.logoutButton}
-                                buttonColor="#f44336"
-                                icon={() => <LogOut size={16} color="#fff" />}
+                                activeOpacity={0.8}
                             >
-                                Logout
-                            </Button>
+                                <LogOut size={20} color="#fff" />
+                                <Text style={styles.logoutBtnText}>Logout</Text>
+                            </TouchableOpacity>
 
-                            <Text variant="bodySmall" style={styles.versionText}>Version 2.0.1 (Expo Go)</Text>
+                            <Text style={styles.versionText}>Version 2.0.1 (Expo Go)</Text>
                         </View>
                     </ScrollView>
-                </View>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -138,44 +178,59 @@ const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     backdrop: {
         ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
     },
     sheetContent: {
         backgroundColor: '#fff',
-        borderTopLeftRadius: 25,
-        borderTopRightRadius: 25,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
         height: SCREEN_HEIGHT * 0.85,
         width: '100%',
         paddingTop: 12,
-        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: -4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 10,
+            },
+            android: {
+                elevation: 20,
+            }
+        })
     },
     dragHandle: {
         width: 40,
         height: 5,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 3,
+        backgroundColor: '#eee',
+        borderRadius: 10,
         alignSelf: 'center',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     closeButton: {
         position: 'absolute',
         top: 15,
         right: 20,
-        zIndex: 1,
+        zIndex: 10,
+        padding: 5,
     },
     header: {
-        padding: 24,
+        paddingTop: 30,
+        paddingBottom: 20,
         alignItems: 'center',
     },
     name: {
-        marginTop: 10,
+        marginTop: 15,
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 22,
+        color: '#1a1a1a',
+    },
+    userInfoSub: {
+        alignItems: 'center',
+        marginTop: 4,
     },
     email: {
         color: '#666',
@@ -183,48 +238,91 @@ const styles = StyleSheet.create({
     },
     phone: {
         color: '#999',
-        fontSize: 12,
-        marginTop: 4,
+        fontSize: 13,
+        marginTop: 2,
     },
     content: {
         padding: 20,
-        paddingBottom: 40,
+        paddingBottom: 60,
     },
-    availabilityCard: {
-        borderWidth: 1,
-        borderRadius: 12,
+    availabilityBox: {
+        borderRadius: 20,
+        padding: 16,
         marginBottom: 20,
-        elevation: 0,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.03)',
     },
     availabilityRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
+    availStatusText: {
+        fontSize: 17,
+        fontWeight: 'bold',
+    },
+    availSubtext: {
+        color: '#666',
+        fontSize: 12,
+        marginTop: 2,
+    },
     menuCard: {
         backgroundColor: '#fff',
-        borderRadius: 12,
-        elevation: 0,
+        borderRadius: 24,
+        paddingVertical: 8,
+        paddingHorizontal: 4,
         borderWidth: 1,
         borderColor: '#f0f0f0',
-        marginBottom: 20,
+        marginBottom: 28,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+    },
+    menuLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
     },
     iconCircle: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
         backgroundColor: SECONDARY_BG,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10,
     },
-    logoutButton: {
-        borderRadius: 12,
-        paddingVertical: 2,
+    menuTitle: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#333',
+    },
+    menuDivider: {
+        backgroundColor: '#f8f8f8',
+        marginHorizontal: 20,
+    },
+    logoutBtn: {
+        backgroundColor: '#ff4d4d',
+        height: 56,
+        borderRadius: 18,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
+        width: '100%',
+    },
+    logoutBtnText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     versionText: {
         textAlign: 'center',
-        color: '#999',
-        marginTop: 20,
+        color: '#ccc',
+        marginTop: 30,
+        fontSize: 12,
     }
 });

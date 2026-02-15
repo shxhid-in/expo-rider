@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Card, Title, IconButton, Divider } from 'react-native-paper';
-import { ChevronLeft, ChevronRight, TrendingUp, HandCoins, CalendarDays, Package, IndianRupee } from 'lucide-react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Modal, Pressable, Dimensions } from 'react-native';
+import { Text, Title, Divider } from 'react-native-paper';
+import { ChevronLeft, ChevronRight, TrendingUp, HandCoins, CalendarDays, Package, IndianRupee, X } from 'lucide-react-native';
+import { Calendar } from 'react-native-calendars';
 
+const { width, height } = Dimensions.get('window');
 const PRIMARY_COLOR = '#008080';
 
 export default function EarningsScreen() {
-    // Current date logic (Mocking)
     const today = new Date();
     const [selectedDate, setSelectedDate] = useState(today);
+    const [isCalendarVisible, setIsCalendarVisible] = useState(false);
 
-    // Mock data for specific days with individual order breakdowns
+    // Mock data
     const dailyData: any = {
         '2026-02-15': {
             orders: 3,
             earnings: 115,
-            distance: 12,
             orderBreakdown: [
                 { id: '8842', amount: 45, time: '10:30 AM' },
                 { id: '8845', amount: 35, time: '12:15 PM' },
@@ -25,13 +26,12 @@ export default function EarningsScreen() {
         '2026-02-14': {
             orders: 2,
             earnings: 80,
-            distance: 8,
             orderBreakdown: [
                 { id: '8830', amount: 40, time: '11:00 AM' },
                 { id: '8835', amount: 40, time: '03:30 PM' }
             ]
         },
-        'default': { orders: 0, earnings: 0, distance: 0, orderBreakdown: [] }
+        'default': { orders: 0, earnings: 0, orderBreakdown: [] }
     };
 
     const formatDate = (date: Date) => {
@@ -47,21 +47,32 @@ export default function EarningsScreen() {
     const changeDate = (days: number) => {
         const nextDate = new Date(selectedDate);
         nextDate.setDate(selectedDate.getDate() + days);
-        setSelectedDate(nextDate);
+        if (nextDate <= today) {
+            setSelectedDate(nextDate);
+        }
+    };
+
+    const onDateSelect = (day: any) => {
+        setSelectedDate(new Date(day.timestamp));
+        setIsCalendarVisible(false);
     };
 
     return (
         <View style={styles.mainContainer}>
-            <ScrollView style={styles.container}>
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 <View style={styles.content}>
                     {/* Premium Date Selection Box */}
-                    <Card style={styles.dateSelectorCard}>
-                        <Card.Content style={styles.dateSelectorContent}>
-                            <TouchableOpacity onPress={() => changeDate(-1)}>
+                    <View style={styles.dateSelectorCard}>
+                        <View style={styles.dateSelectorContent}>
+                            <TouchableOpacity onPress={() => changeDate(-1)} style={styles.arrowButton}>
                                 <ChevronLeft size={28} color={PRIMARY_COLOR} />
                             </TouchableOpacity>
 
-                            <View style={styles.dateInfo}>
+                            <TouchableOpacity
+                                onPress={() => setIsCalendarVisible(true)}
+                                style={styles.dateInfo}
+                                activeOpacity={0.7}
+                            >
                                 <CalendarDays size={20} color={PRIMARY_COLOR} style={{ marginBottom: 4 }} />
                                 <Text variant="titleMedium" style={styles.dateText}>{displayDate(selectedDate)}</Text>
                                 {formatDate(selectedDate) === formatDate(today) && (
@@ -69,30 +80,34 @@ export default function EarningsScreen() {
                                         <Text style={styles.todayBadgeText}>TODAY</Text>
                                     </View>
                                 )}
-                            </View>
+                            </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => changeDate(1)}>
+                            <TouchableOpacity
+                                onPress={() => changeDate(1)}
+                                style={[styles.arrowButton, formatDate(selectedDate) === formatDate(today) && { opacity: 0.2 }]}
+                                disabled={formatDate(selectedDate) === formatDate(today)}
+                            >
                                 <ChevronRight size={28} color={PRIMARY_COLOR} />
                             </TouchableOpacity>
-                        </Card.Content>
-                    </Card>
+                        </View>
+                    </View>
 
                     {/* Summary for Selected Date */}
                     <View style={styles.summaryGrid}>
-                        <Card style={styles.statCard}>
-                            <Card.Content style={styles.statContent}>
+                        <View style={styles.statCard}>
+                            <View style={styles.statContent}>
                                 <TrendingUp size={24} color={PRIMARY_COLOR} />
                                 <Text style={styles.statValue}>{currentData.orders}</Text>
                                 <Text style={styles.statLabel}>Orders</Text>
-                            </Card.Content>
-                        </Card>
-                        <Card style={styles.statCard}>
-                            <Card.Content style={styles.statContent}>
+                            </View>
+                        </View>
+                        <View style={styles.statCard}>
+                            <View style={styles.statContent}>
                                 <HandCoins size={24} color={PRIMARY_COLOR} />
                                 <Text style={styles.statValue}>₹{currentData.earnings}</Text>
                                 <Text style={styles.statLabel}>Earnings</Text>
-                            </Card.Content>
-                        </Card>
+                            </View>
+                        </View>
                     </View>
 
                     {/* Per Order Earnings List */}
@@ -103,8 +118,8 @@ export default function EarningsScreen() {
 
                     {currentData.orderBreakdown.length > 0 ? (
                         currentData.orderBreakdown.map((order: any, index: number) => (
-                            <Card key={index} style={styles.orderRowCard}>
-                                <Card.Content style={styles.orderRowContent}>
+                            <View key={index} style={styles.orderRowCard}>
+                                <View style={styles.orderRowContent}>
                                     <View style={styles.orderInfo}>
                                         <View style={styles.iconCircle}>
                                             <Package size={18} color={PRIMARY_COLOR} />
@@ -118,8 +133,8 @@ export default function EarningsScreen() {
                                         <IndianRupee size={12} color={PRIMARY_COLOR} />
                                         <Text style={styles.orderAmountText}>{order.amount}</Text>
                                     </View>
-                                </Card.Content>
-                            </Card>
+                                </View>
+                            </View>
                         ))
                     ) : (
                         <View style={styles.emptyState}>
@@ -139,6 +154,57 @@ export default function EarningsScreen() {
                     )}
                 </View>
             </ScrollView>
+
+            {/* Custom Premium Calendar Modal */}
+            <Modal
+                visible={isCalendarVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIsCalendarVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <Pressable style={styles.backdrop} onPress={() => setIsCalendarVisible(false)} />
+                    <View style={styles.calendarContainer}>
+                        <View style={styles.calendarHeader}>
+                            <Text style={styles.calendarHeaderTitle}>Select Date</Text>
+                            <TouchableOpacity onPress={() => setIsCalendarVisible(false)}>
+                                <X size={24} color="#666" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Calendar
+                            current={formatDate(selectedDate)}
+                            maxDate={formatDate(today)}
+                            onDayPress={onDateSelect}
+                            markedDates={{
+                                [formatDate(selectedDate)]: { selected: true, selectedColor: PRIMARY_COLOR }
+                            }}
+                            theme={{
+                                backgroundColor: '#ffffff',
+                                calendarBackground: '#ffffff',
+                                textSectionTitleColor: '#b6c1cd',
+                                selectedDayBackgroundColor: PRIMARY_COLOR,
+                                selectedDayTextColor: '#ffffff',
+                                todayTextColor: PRIMARY_COLOR,
+                                dayTextColor: '#2d4150',
+                                textDisabledColor: '#d9e1e8',
+                                dotColor: PRIMARY_COLOR,
+                                selectedDotColor: '#ffffff',
+                                arrowColor: PRIMARY_COLOR,
+                                monthTextColor: '#1a1a1a',
+                                indicatorColor: PRIMARY_COLOR,
+                                textDayFontWeight: '500',
+                                textMonthFontWeight: 'bold',
+                                textDayHeaderFontWeight: 'bold',
+                                textDayFontSize: 14,
+                                textMonthFontSize: 16,
+                                textDayHeaderFontSize: 12,
+                            }}
+                            style={styles.calendarStyle}
+                        />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -158,22 +224,31 @@ const styles = StyleSheet.create({
     dateSelectorCard: {
         backgroundColor: '#fff',
         elevation: 6,
-        borderRadius: 20,
+        borderRadius: 15,
         marginBottom: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     dateSelectorContent: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 16,
+    },
+    arrowButton: {
+        padding: 8,
     },
     dateInfo: {
         alignItems: 'center',
+        flex: 1,
     },
     dateText: {
         fontWeight: 'bold',
         color: '#1a1a1a',
-        fontSize: 18,
+        fontSize: 20,
     },
     todayBadge: {
         backgroundColor: 'rgba(0, 128, 128, 0.1)',
@@ -197,6 +272,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 16,
         elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
     },
     statContent: {
         alignItems: 'center',
@@ -232,17 +311,22 @@ const styles = StyleSheet.create({
     },
     orderRowCard: {
         backgroundColor: '#fff',
-        borderRadius: 12,
+        borderRadius: 16,
         marginBottom: 12,
         elevation: 1,
-        borderLeftWidth: 3,
+        borderLeftWidth: 4,
         borderLeftColor: PRIMARY_COLOR,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 1,
     },
     orderRowContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 10,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
     },
     orderInfo: {
         flexDirection: 'row',
@@ -312,5 +396,39 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: PRIMARY_COLOR,
+    },
+    // Calendar Styles
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    },
+    calendarContainer: {
+        width: width * 0.9,
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        paddingBottom: 10,
+        overflow: 'hidden',
+        elevation: 10,
+    },
+    calendarHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    calendarHeaderTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1a1a1a',
+    },
+    calendarStyle: {
+        borderRadius: 15,
     }
 });

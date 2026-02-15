@@ -39,15 +39,15 @@ export default function HomeScreen() {
         <View style={styles.mainContainer}>
             <ScrollView style={styles.container}>
                 <View style={styles.content}>
-                    {/* Weekly Summary Card (Moved from Earnings) */}
-                    <Card style={styles.weeklyCard}>
-                        <Card.Content>
+                    {/* Weekly Summary Container (Standard View for better corner control) */}
+                    <View style={styles.weeklyCard}>
+                        <View style={styles.cardContent}>
                             <View style={styles.weeklyHeader}>
                                 <View>
                                     <Title style={{ color: PRIMARY_COLOR, fontWeight: 'bold' }}>Weekly Summary</Title>
                                     <Text variant="bodySmall" style={{ color: '#666' }}>{weeklySummary.weekRange}</Text>
                                 </View>
-                                <Chip mode="flat" style={styles.payoutChip} textStyle={{ color: '#fff', fontSize: 10 }}>
+                                <Chip mode="flat" style={styles.payoutChip} textStyle={{ color: '#fff', fontSize: 12, fontWeight: 'bold' }}>
                                     Payout: Sunday
                                 </Chip>
                             </View>
@@ -80,15 +80,14 @@ export default function HomeScreen() {
                                     ₹{weeklySummary.finalPayout}
                                 </Text>
                             </View>
-                        </Card.Content>
-                    </Card>
+                        </View>
+                    </View>
 
                     {/* Active Orders Section */}
                     <View style={styles.sectionHeader}>
-                        <Text variant="titleLarge" style={styles.sectionTitle}>
-                            Active Orders ({activeOrders.length})
+                        <Text style={styles.sectionTitle}>
+                            Active Orders
                         </Text>
-                        <TrendingUp size={20} color={PRIMARY_COLOR} />
                     </View>
 
                     {activeOrders.map((order) => (
@@ -96,22 +95,21 @@ export default function HomeScreen() {
                             key={order.id}
                             activeOpacity={0.7}
                             onPress={() => router.push('/orders')}
+                            style={styles.orderCard}
                         >
-                            <Card style={styles.orderCard}>
-                                <Card.Content>
-                                    <View style={styles.orderHeader}>
-                                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <View>
-                                                <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>Order #{order.id}</Text>
-                                                <Text variant="bodySmall" style={{ color: PRIMARY_COLOR, fontWeight: 'bold', marginTop: 2 }}>
-                                                    {order.status}
-                                                </Text>
-                                            </View>
-                                            <Text variant="titleLarge" style={{ color: '#333', fontWeight: 'bold' }}>₹{order.distanceEarning}</Text>
+                            <View style={styles.cardContent}>
+                                <View style={styles.orderHeader}>
+                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <View>
+                                            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>Order #{order.id}</Text>
+                                            <Text variant="bodySmall" style={{ color: PRIMARY_COLOR, fontWeight: 'bold', marginTop: 2 }}>
+                                                {order.status}
+                                            </Text>
                                         </View>
+                                        <Text variant="titleLarge" style={{ color: '#333', fontWeight: 'bold' }}>₹{order.distanceEarning}</Text>
                                     </View>
-                                </Card.Content>
-                            </Card>
+                                </View>
+                            </View>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -129,26 +127,34 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     content: {
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingTop: 8, // Reduced top margin
         paddingBottom: 160,
     },
     weeklyCard: {
         backgroundColor: '#fff',
-        elevation: 4,
-        borderRadius: 16,
+        borderRadius: 15, // Slighly more rounded
         marginBottom: 24,
-        borderTopWidth: 4,
-        borderTopColor: PRIMARY_COLOR,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+    },
+    cardContent: {
+        padding: 20, // Proper internal spacing
     },
     weeklyHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
+        alignItems: 'center', // Better alignment with Title
         marginBottom: 20,
+        paddingTop: 4,
     },
     payoutChip: {
         backgroundColor: PRIMARY_COLOR,
-        height: 24,
+        height: 28, // Slighly taller for better text vertical centering
+        borderRadius: 14,
     },
     grid: {
         flexDirection: 'row',
@@ -160,7 +166,7 @@ const styles = StyleSheet.create({
         width: '48%',
         backgroundColor: '#f1f8f8',
         padding: 15,
-        borderRadius: 12,
+        borderRadius: 16, // Rounded
         alignItems: 'center',
         marginBottom: 12,
         borderWidth: 1,
@@ -194,6 +200,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     sectionTitle: {
+        fontSize: 16, // Decreased from TitleLarge default
         fontWeight: 'bold',
         color: '#333',
     },
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         backgroundColor: '#fff',
         elevation: 2,
-        borderRadius: 12,
+        borderRadius: 16, // Rounded
     },
     orderHeader: {
         flexDirection: 'row',
