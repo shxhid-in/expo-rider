@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { Text, Card, Title, Paragraph, Button, Chip, Divider, ProgressBar, MD3Colors } from 'react-native-paper';
 import { MapPin, Phone, ClipboardList } from 'lucide-react-native';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function HomeScreen() {
     // Mock data as requested

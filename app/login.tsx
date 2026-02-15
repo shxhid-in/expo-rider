@@ -4,7 +4,7 @@ import { Text, TextInput, Button, Card, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Lock, User } from 'lucide-react-native';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function LoginScreen() {
     const [username, setUsername] = useState('');

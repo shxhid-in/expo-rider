@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Text, Card, Title, Paragraph, Button, Chip, Divider, SegmentedButtons } from 'react-native-paper';
 import { MapPin, Phone, Package, Navigation, Clock, CreditCard, ChevronDown } from 'lucide-react-native';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function OrdersScreen() {
     const [activeTab, setActiveTab] = useState('active');
@@ -146,7 +146,6 @@ export default function OrdersScreen() {
                                     onPress={() => { }}
                                     style={styles.statusButton}
                                     textColor={order.status === 'Out-for-pickup' ? '#0288D1' : '#1B5E20'}
-                                    outlineColor={order.status === 'Out-for-pickup' ? '#0288D1' : '#1B5E20'}
                                 >
                                     {order.status === 'Out-for-pickup' ? 'Mark as Picked Up' : 'Mark as Delivered'}
                                 </Button>

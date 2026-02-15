@@ -4,7 +4,7 @@ import { Text, TextInput, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { Lock, User, Phone, Mail } from 'lucide-react-native';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function SignupScreen() {
     const [name, setName] = useState('');

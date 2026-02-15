@@ -4,7 +4,7 @@ import { Text, Card, Title, Avatar, List, Switch, Divider, Button, useTheme } fr
 import { User, FileText, Landmark, Bell, LogOut, ChevronRight, Settings } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function ProfileScreen() {
     const [isAvailable, setIsAvailable] = useState(true);
@@ -24,7 +24,7 @@ export default function ProfileScreen() {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.header}>
-                <Avatar.Icon size={80} icon="account" backgroundColor={PRIMARY_COLOR} />
+                <Avatar.Icon size={80} icon="account" style={{ backgroundColor: PRIMARY_COLOR }} />
                 <Title style={styles.name}>{user.name}</Title>
                 <Text style={styles.email}>{user.email}</Text>
                 <Text style={styles.phone}>{user.phone}</Text>

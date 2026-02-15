@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Card, Title, Paragraph, Button, Chip, Divider, IconButton } from 'react-native-paper';
 import { ChevronLeft, ChevronRight, Wallet, BadgePercent, TrendingUp, HandCoins } from 'lucide-react-native';
 
-const PRIMARY_COLOR = '#FF6B00';
+const PRIMARY_COLOR = '#008080';
 
 export default function EarningsScreen() {
     const [currentDayIndex, setCurrentDayIndex] = useState(3); // Mocking Thursday

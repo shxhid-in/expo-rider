@@ -5,7 +5,7 @@ import { Home, ClipboardList, Wallet, User } from 'lucide-react-native';
 export default function TabLayout() {
     return (
         <Tabs screenOptions={{
-            tabBarActiveTintColor: '#FF6B00',
+            tabBarActiveTintColor: '#008080',
             tabBarStyle: {
                 height: 60,
                 paddingBottom: 10,
