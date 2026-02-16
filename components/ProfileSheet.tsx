@@ -137,7 +137,7 @@ export default function ProfileSheet({ visible, onDismiss }: ProfileSheetProps) 
                                             {isAvailable ? 'Available for Orders' : 'Offline'}
                                         </Text>
                                         <Text style={styles.availSubtext}>
-                                            Toggle to start/stop receiving deliveries
+                                            Toggle to start/stop receiving orders
                                         </Text>
                                     </View>
                                     <Switch

@@ -7,9 +7,10 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <PaperProvider>
                 <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                    <Stack.Screen name="login" options={{ title: 'Login' }} />
+                    <Stack.Screen name="index" options={{ title: 'Login' }} />
                     <Stack.Screen name="signup" options={{ title: 'Sign Up' }} />
+                    <Stack.Screen name="verification" options={{ title: 'Verification' }} />
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 </Stack>
             </PaperProvider>
         </GestureHandlerRootView>

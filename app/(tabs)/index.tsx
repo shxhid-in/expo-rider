@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Card, Title, Chip } from 'react-native-paper';
-import { Wallet, TrendingUp } from 'lucide-react-native';
+import { Text, Title, Chip } from 'react-native-paper';
+import { Wallet, TrendingUp, Trophy } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 const PRIMARY_COLOR = '#008080';
@@ -18,28 +18,11 @@ export default function HomeScreen() {
         finalPayout: 6740.00,
     };
 
-    const activeOrders = [
-        {
-            id: 'ORD001',
-            customerName: 'Rahul Sharma',
-            address: '123, MG Road, Bangalore',
-            status: 'Out-for-pickup',
-            distanceEarning: 65,
-        },
-        {
-            id: 'ORD002',
-            customerName: 'Priya Verma',
-            address: '45, Indiranagar, Bangalore',
-            status: 'Picked Up',
-            distanceEarning: 48,
-        }
-    ];
-
     return (
         <View style={styles.mainContainer}>
             <ScrollView style={styles.container}>
                 <View style={styles.content}>
-                    {/* Weekly Summary Container (Standard View for better corner control) */}
+                    {/* Weekly Summary Container */}
                     <View style={styles.weeklyCard}>
                         <View style={styles.cardContent}>
                             <View style={styles.weeklyHeader}>
@@ -83,35 +66,53 @@ export default function HomeScreen() {
                         </View>
                     </View>
 
-                    {/* Active Orders Section */}
+                    {/* Achievements Section */}
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>
-                            Active Orders
-                        </Text>
+                        <Text style={styles.sectionTitle}>Weekly Goal Progress</Text>
                     </View>
 
-                    {activeOrders.map((order) => (
-                        <TouchableOpacity
-                            key={order.id}
-                            activeOpacity={0.7}
-                            onPress={() => router.push('/orders')}
-                            style={styles.orderCard}
-                        >
-                            <View style={styles.cardContent}>
-                                <View style={styles.orderHeader}>
-                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <View>
-                                            <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>Order #{order.id}</Text>
-                                            <Text variant="bodySmall" style={{ color: PRIMARY_COLOR, fontWeight: 'bold', marginTop: 2 }}>
-                                                {order.status}
-                                            </Text>
-                                        </View>
-                                        <Text variant="titleLarge" style={{ color: '#333', fontWeight: 'bold' }}>₹{order.distanceEarning}</Text>
-                                    </View>
-                                </View>
+                    <View style={styles.streakCard}>
+                        <View style={styles.streakHeader}>
+                            <View style={styles.pentagonBadge}>
+                                <Trophy size={32} color="#fff" />
                             </View>
-                        </TouchableOpacity>
-                    ))}
+                            <Text style={styles.streakTitle}>3 Day Streak!</Text>
+                            <Text style={styles.streakSubtitle}>You are on the right track</Text>
+                        </View>
+
+                        <View style={styles.daysRow}>
+                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+                                const isCompleted = index < 3;
+                                const isToday = index === 3;
+                                return (
+                                    <View key={day} style={styles.dayItem}>
+                                        <Text style={styles.dayLabel}>{day}</Text>
+                                        <View style={[
+                                            styles.dayStatus,
+                                            isCompleted && styles.dayCompleted,
+                                            isToday && styles.dayToday
+                                        ]}>
+                                            {isCompleted ? (
+                                                <TrendingUp size={14} color="#fff" />
+                                            ) : (
+                                                <Text style={[styles.dayNumber, isToday && styles.dayNumberToday]}>{index + 8}</Text>
+                                            )}
+                                        </View>
+                                    </View>
+                                );
+                            })}
+                        </View>
+                    </View>
+
+                    <View style={styles.achievementCardCentered}>
+                        <View style={styles.achievementInfoCentered}>
+                            <Text style={styles.achievementTitleCentered}>Target Order</Text>
+                            <Text style={styles.achievementProgressCentered}>82/100 orders this week</Text>
+                            <View style={styles.progressBarBgLarge}>
+                                <View style={[styles.progressBarFillLarge, { width: '82%' }]} />
+                            </View>
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </View>
@@ -128,12 +129,12 @@ const styles = StyleSheet.create({
     },
     content: {
         paddingHorizontal: 16,
-        paddingTop: 8, // Reduced top margin
+        paddingTop: 8,
         paddingBottom: 160,
     },
     weeklyCard: {
         backgroundColor: '#fff',
-        borderRadius: 15, // Slighly more rounded
+        borderRadius: 15,
         marginBottom: 24,
         elevation: 4,
         shadowColor: '#000',
@@ -142,18 +143,18 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
     },
     cardContent: {
-        padding: 20, // Proper internal spacing
+        padding: 20,
     },
     weeklyHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center', // Better alignment with Title
+        alignItems: 'center',
         marginBottom: 20,
         paddingTop: 4,
     },
     payoutChip: {
         backgroundColor: PRIMARY_COLOR,
-        height: 28, // Slighly taller for better text vertical centering
+        height: 28,
         borderRadius: 14,
     },
     grid: {
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
         width: '48%',
         backgroundColor: '#f1f8f8',
         padding: 15,
-        borderRadius: 16, // Rounded
+        borderRadius: 15,
         alignItems: 'center',
         marginBottom: 12,
         borderWidth: 1,
@@ -200,18 +201,120 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     sectionTitle: {
-        fontSize: 16, // Decreased from TitleLarge default
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
     },
-    orderCard: {
-        marginBottom: 16,
+    streakCard: {
         backgroundColor: '#fff',
-        elevation: 2,
-        borderRadius: 16, // Rounded
+        borderRadius: 15,
+        padding: 24,
+        marginBottom: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        alignItems: 'center',
     },
-    orderHeader: {
+    streakHeader: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    pentagonBadge: {
+        width: 60,
+        height: 60,
+        backgroundColor: PRIMARY_COLOR,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        marginBottom: 16,
+        transform: [{ rotate: '45deg' }],
+    },
+    streakTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1a1a1a',
+    },
+    streakSubtitle: {
+        fontSize: 14,
+        color: '#666',
+        marginTop: 4,
+    },
+    daysRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: 10,
+    },
+    dayItem: {
+        alignItems: 'center',
+        gap: 8,
+    },
+    dayLabel: {
+        fontSize: 12,
+        color: '#999',
+        fontWeight: '500',
+    },
+    dayStatus: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#f5f5f5',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dayCompleted: {
+        backgroundColor: PRIMARY_COLOR,
+    },
+    dayToday: {
+        borderWidth: 2,
+        borderColor: PRIMARY_COLOR,
+        backgroundColor: '#fff',
+    },
+    dayNumber: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    dayNumberToday: {
+        color: PRIMARY_COLOR,
+    },
+    achievementCardCentered: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 24,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+    },
+    achievementInfoCentered: {
+        alignItems: 'center',
+    },
+    achievementTitleCentered: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1a1a1a',
+        marginBottom: 4,
+    },
+    achievementProgressCentered: {
+        fontSize: 13,
+        color: '#666',
+        marginBottom: 12,
+    },
+    progressBarBgLarge: {
+        height: 8,
+        backgroundColor: '#f1f1f1',
+        borderRadius: 4,
+        width: '100%',
+        overflow: 'hidden',
+    },
+    progressBarFillLarge: {
+        height: '100%',
+        backgroundColor: PRIMARY_COLOR,
+        borderRadius: 4,
     }
 });

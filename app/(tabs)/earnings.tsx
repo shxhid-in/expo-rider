@@ -430,5 +430,5 @@ const styles = StyleSheet.create({
     },
     calendarStyle: {
         borderRadius: 15,
-    }
+    },
 });
