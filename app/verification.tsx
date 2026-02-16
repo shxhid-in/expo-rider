@@ -22,8 +22,7 @@ export default function VerificationScreen() {
 
         let result = await ImagePicker.launchCameraAsync({
             cameraType: ImagePicker.CameraType.front,
-            allowsEditing: true,
-            aspect: [1, 1],
+            allowsEditing: false,
             quality: 0.8,
         });
 

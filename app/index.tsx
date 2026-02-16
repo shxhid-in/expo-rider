@@ -205,13 +205,13 @@ const styles = StyleSheet.create({
         marginTop: 40,
     },
     logoText: {
-        fontSize: 48,
+        fontSize: 20,
         fontWeight: '900',
         color: '#fff',
         letterSpacing: -1,
     },
     riderText: {
-        fontSize: 18,
+        fontSize: 50,
         fontWeight: 'bold',
         color: 'rgba(255, 255, 255, 0.8)',
         marginTop: -10,

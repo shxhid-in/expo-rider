@@ -68,10 +68,11 @@ export default function ProfileSheet({ visible, onDismiss }: ProfileSheetProps) 
     };
 
     const handleLogout = () => {
-        handleDismiss();
+        onDismiss();
+        // Give the modal a moment to animate out before switching stacks
         setTimeout(() => {
-            router.replace('/login');
-        }, 300);
+            router.replace('/');
+        }, 150);
     };
 
     const MenuItem = ({ icon: Icon, title, onPress, showDivider = true }: any) => (
@@ -156,14 +157,16 @@ export default function ProfileSheet({ visible, onDismiss }: ProfileSheetProps) 
                                 <MenuItem icon={Bell} title="Notifications" onPress={() => { }} showDivider={false} />
                             </View>
 
-                            <TouchableOpacity
-                                style={styles.logoutBtn}
+                            <Button
+                                mode="contained"
                                 onPress={handleLogout}
-                                activeOpacity={0.8}
+                                style={styles.logoutBtn}
+                                contentStyle={styles.logoutBtnContent}
+                                buttonColor="#ff4d4d"
+                                icon={() => <LogOut size={20} color="#fff" />}
                             >
-                                <LogOut size={20} color="#fff" />
-                                <Text style={styles.logoutBtnText}>Logout</Text>
-                            </TouchableOpacity>
+                                Logout
+                            </Button>
 
                             <Text style={styles.versionText}>Version 2.0.1 (Expo Go)</Text>
                         </View>
@@ -305,19 +308,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
     },
     logoutBtn: {
-        backgroundColor: '#ff4d4d',
-        height: 56,
         borderRadius: 18,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        width: '100%',
+        marginTop: 10,
+        elevation: 0,
     },
-    logoutBtnText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
+    logoutBtnContent: {
+        height: 56,
     },
     versionText: {
         textAlign: 'center',

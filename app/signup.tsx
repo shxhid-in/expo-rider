@@ -15,7 +15,7 @@ export default function SignupScreen() {
 
     const handleSignup = () => {
         // UI Only: Just navigate to login
-        router.replace('/login');
+        router.replace('/');
     };
 
     return (
@@ -25,7 +25,7 @@ export default function SignupScreen() {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Text variant="headlineMedium" style={styles.title}>Join Rider Joy</Text>
+                    <Text variant="headlineMedium" style={styles.title}>Join Bezgo</Text>
                     <Text variant="bodyMedium" style={styles.subtitle}>Start your journey with us today</Text>
                 </View>
 
@@ -87,7 +87,7 @@ export default function SignupScreen() {
                         Create Account
                     </Button>
 
-                    <TouchableOpacity onPress={() => router.push('/login')}>
+                    <TouchableOpacity onPress={() => router.push('/')}>
                         <Text style={styles.footerText}>
                             Already have an account? <Text style={styles.linkText}>Sign In</Text>
                         </Text>
